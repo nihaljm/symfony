@@ -1,0 +1,59 @@
+{# templates/product/show.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Product Page{% endblock %}
+
+{% block body %}
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?auto=compress&cs=tinysrgb&w=800"
+                     class="img-fluid rounded"
+                     alt="Product">
+            </div>
+
+            <div class="col-md-6">
+                <h1 class="mb-3">Premium Wireless Headphones</h1>
+                <p class="text-muted fs-4 mb-3">$129.99</p>
+
+                <p class="mb-4">
+                    Experience superior sound quality with our premium wireless headphones.
+                    Features active noise cancellation, 30-hour battery life, and premium comfort padding.
+                </p>
+
+                <ul class="list-unstyled mb-4">
+                    <li><strong>Brand:</strong> AudioTech</li>
+                    <li><strong>Color:</strong> Matte Black</li>
+                    <li><strong>Connectivity:</strong> Bluetooth 5.0</li>
+                    <li><strong>Battery Life:</strong> 30 hours</li>
+                </ul>
+
+                {# Symfony Form #}
+                {{ form_start(form, {
+                    action: path('app_product_show'),
+                    attr: {'class': 'mb-3'}
+                }) }}
+
+                {{ form_row(form.quantity, {
+                    row_attr: {'class': 'mb-3'},
+                    attr: {'style': 'max-width: 100px;'}
+                }) }}
+
+                {{ form_row(form.color, {
+                    row_attr: {'class': 'mb-3'},
+                    attr: {'style': 'max-width: 200px;'}
+                }) }}
+
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Add to Cart
+                </button>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
