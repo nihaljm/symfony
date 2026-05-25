@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Profile - Our Store{% endblock %}
+
+{% block body %}
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <img src="{{ asset('images/profile.png') }}" class="rounded-circle mb-3 border" alt="User Avatar" width="120" height="120" style="object-fit: cover;">
+                        <h5 class="card-title fw-semibold">{{ user.fullName }}</h5>
+                        <p class="text-muted small mb-3">{{ user.email }}</p>
+                        <hr>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><a href="#profile" class="text-decoration-none fw-medium text-dark">Profile Information</a></li>
+                            <li class="mb-2"><a href="#orders" class="text-decoration-none fw-medium text-dark">My Orders</a></li>
+                            <li class="mb-2"><a href="{{ path('app_logout') }}" class="text-decoration-none fw-medium text-danger">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="card border-0 shadow-sm mb-4" id="profile">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0 fw-semibold">Profile Information</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small uppercase">Full Name</label>
+                                <p class="fs-5">{{ user.fullName }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small uppercase">Email Address</label>
+                                <p class="fs-5">{{ user.email }}</p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small uppercase">Roles</label>
+                                <p class="fs-5">{{ user.roles|join(', ') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small uppercase">Member Status</label>
+                                <p class="fs-5 text-success">Active Member</p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="fw-bold text-muted small uppercase">Shipping Address</label>
+                                <p class="fs-5">{{ user.address ?: 'No shipping address provided.' }}</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary px-4" onclick="alert('Profile editing is not implemented in this demo.');">Edit Profile</button>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm" id="orders">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0 fw-semibold">Order History</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if orders is empty %}
+                            <div class="text-center py-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-box-seam text-muted mb-3" viewBox="0 0 16 16">
+                                    <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.962L10.404 2zm3.564 1.426L5.566 5.007 8 5.98l6.186-2.475zM15.834 5.38a.5.5 0 0 0-.196-.166L8 2.223 1.01 5.007a.5.5 0 0 0-.3.458v6.52c0 .2.12.383.3.458l7 2.8a.5.5 0 0 0 .372 0l7-2.8a.5.5 0 0 0 .3-.458V5.838a.5.5 0 0 0-.048-.225ZM6 14.526 1 12.526V6.842l5 2zm1 0V8.842l5-2v5.684z"/>
+                                </svg>
+                                <p class="text-muted">You have not placed any orders yet.</p>
+                                <a href="{{ path('app_products') }}" class="btn btn-outline-primary px-4 btn-sm">Browse Products</a>
+                            </div>
+                        {% else %}
+                            {% for order in orders %}
+                                <div class="card mb-3 border shadow-none bg-light-subtle">
+                                    <div class="card-body p-4">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <h6 class="fw-bold mb-2">Order #ORD-{{ order.id|format('%04d') }}</h6>
+                                                <p class="text-muted small mb-2">Placed on: {{ order.createdAt|date('F d, Y H:i') }}</p>
+                                                
+                                                <p class="mb-2"><strong>Items:</strong></p>
+                                                <ul class="list-unstyled ps-3 small text-muted">
+                                                    {% set orderTotal = 0.0 %}
+                                                    {% for item in order.orderItems %}
+                                                        {% set itemSubtotal = item.price * item.quantity %}
+                                                        {% set orderTotal = orderTotal + itemSubtotal %}
+                                                        <li class="mb-1">• {{ item.product.name }} (x{{ item.quantity }}) - ${{ item.price|number_format(2) }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                                
+                                                <p class="mb-0 mt-2"><strong>Total:</strong> <span class="text-success fw-bold">${{ orderTotal|number_format(2) }}</span></p>
+                                            </div>
+                                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                                <span class="badge bg-success py-2 px-3 fs-6">
+                                                    {{ order.status }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

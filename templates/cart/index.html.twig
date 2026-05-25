@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shopping Cart - Our Store{% endblock %}
+
+{% block body %}
+    <div class="container my-5">
+        <h1 class="mb-4 fw-bold">Shopping Cart</h1>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-body">
+                        {% if items is empty %}
+                            <div class="text-center py-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-cart3 text-muted mb-3" viewBox="0 0 16 16">
+                                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                </svg>
+                                <p class="text-muted fs-5">Your cart is empty</p>
+                                <a href="{{ path('app_products') }}" class="btn btn-primary px-4 mt-2">Go Shopping</a>
+                            </div>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Product</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Total</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in items %}
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        {% if item.product.image %}
+                                                            <img src="{{ asset('images/' ~ item.product.image) }}" class="img-thumbnail me-3" alt="{{ item.product.name }}" style="width: 80px; height: 80px; object-fit: contain;">
+                                                        {% else %}
+                                                            <img src="{{ asset('images/thumbnail.png') }}" class="img-thumbnail me-3" alt="{{ item.product.name }}" style="width: 80px; height: 80px; object-fit: contain;">
+                                                        {% endif %}
+                                                        <div>
+                                                            <h6 class="mb-0 fw-semibold">{{ item.product.name }}</h6>
+                                                            <small class="text-muted">Category: {{ item.product.category.name }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>${{ item.product.price|number_format(2) }}</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <a href="{{ path('app_cart_decrease', { id: item.product.id }) }}" class="btn btn-sm btn-outline-secondary px-2">-</a>
+                                                        <span class="mx-3 fw-semibold">{{ item.quantity }}</span>
+                                                        <a href="{{ path('app_cart_increase', { id: item.product.id }) }}" class="btn btn-sm btn-outline-secondary px-2">+</a>
+                                                    </div>
+                                                </td>
+                                                <td class="fw-bold text-success">${{ item.subtotal|number_format(2) }}</td>
+                                                <td>
+                                                    <a href="{{ path('app_cart_remove', { id: item.product.id }) }}" class="btn btn-sm btn-outline-danger">Remove</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if items is not empty %}
+                    <a href="{{ path('app_products') }}" class="btn btn-outline-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                        </svg>
+                        Continue Shopping
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if items is not empty %}
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0 fw-semibold">Order Summary</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            {% set shipping = total > 50 ? 0.0 : 10.0 %}
+                            {% set tax = total * 0.1 %}
+                            {% set grandTotal = total + shipping + tax %}
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>${{ total|number_format(2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span>{{ shipping > 0 ? '$' ~ shipping|number_format(2) : 'Free' }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax (10%):</span>
+                                <span>${{ tax|number_format(2) }}</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-4">
+                                <strong>Total:</strong>
+                                <strong class="text-success fs-5">${{ grandTotal|number_format(2) }}</strong>
+                            </div>
+                            <div class="d-grid">
+                                <a href="{{ path('app_cart_checkout') }}" class="btn btn-success btn-lg">Proceed to Checkout</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title fw-semibold">Have a promo code?</h6>
+                            <form onsubmit="event.preventDefault(); alert('Promo code applied!');">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Enter code">
+                                    <button class="btn btn-outline-secondary" type="submit">Apply</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

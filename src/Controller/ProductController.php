@@ -1,26 +1,39 @@
 <?php
+
 namespace App\Controller;
 
-use App\Form\CartItemType;
+use App\Repository\CategoryRepository;
+use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ProductController extends AbstractController
 {
-    #[Route('/product', name: 'app_product_show')]
-    public function show(Request $request): Response
+    #[Route('/category/{id}', name: 'app_category_products')]
+    public function byCategory(int $id, CategoryRepository $categoryRepository): Response
     {
-        $form = $this->createForm(CartItemType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
+        $category = $categoryRepository->find($id);
+        if (!$category) {
+            throw $this->createNotFoundException('Category not found');
         }
 
-        return $this->render('product/show.html.twig', [
-            'form' => $form->createView(),
+        return $this->render('product/by_category.html.twig', [
+            'category' => $category,
+            'products' => $category->getProducts(),
+        ]);
+    }
+
+    #[Route('/product/{id}', name: 'app_product_details')]
+    public function details(int $id, ProductRepository $productRepository): Response
+    {
+        $product = $productRepository->find($id);
+        if (!$product) {
+            throw $this->createNotFoundException('Product not found');
+        }
+
+        return $this->render('product/details.html.twig', [
+            'product' => $product,
         ]);
     }
 }
